@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SigninRequestDto, SignupRequestDto } from './dto';
+import { JwtGuard } from './guard';
 
 
 @Controller('auth')
@@ -17,11 +18,16 @@ export class AuthController {
         return await this.authService.signin(dto);
     }
 
-    @Get('refresh')
-    refresh_token(){}
-    
-    @Get('validate')
-    validate_token(){}
+    @HttpCode(HttpStatus.CREATED)
+    @UseGuards(JwtGuard)
+    @Get('refresh-access-token')
+    async refreshAccessToken(@Request() req) {
+        return await this.authService.signedToken(req.user.id)
+    }
+
+
+    // @Get('validate')
+    // validate_token(){}
     
 
 }
